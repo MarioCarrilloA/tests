@@ -70,14 +70,16 @@ function check_cmds()
 function init_env()
 {
 	cmd=("docker")
-	contr_running=$(docker ps -qa)
 
+	# check dependencies
 	check_cmds "${cmd[@]}"
 
-	# Verify containers running
-	if [ ! -z "$contr_running" ];then
-		docker rm -f $(docker ps -qa)
-	fi
+	# This clean up is more aggressive, this is in order to
+	# decrease the factors that could affect the metrics results.
+	kill_processes_before_start
+
+	# Remove all stopped containers
+	clean_env
 
 	# Restart services
 	systemctl restart docker
